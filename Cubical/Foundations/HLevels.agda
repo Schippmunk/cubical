@@ -113,10 +113,6 @@ isOfHLevelPathP : {A : I → Type ℓ} (n : HLevel)
 isOfHLevelPathP {A = A} n h x y = transport⁻ (λ i → isOfHLevel n (PathP≡Path A x y i))
                                              (isOfHLevelPath n h _ _)
 
-isProp→isContrPathP : {A : I → Type ℓ} → (∀ i → isProp (A i))
-                                       → (x : A i0) (y : A i1) → isContr (PathP A x y)
-isProp→isContrPathP h x y = isProp→PathP h x y , isOfHLevelPathP 1 (h i1) x y _
-
 -- h-level of isOfHLevel
 
 isPropIsOfHLevel : (n : HLevel) → isProp (isOfHLevel n A)
@@ -287,6 +283,12 @@ isOfHLevelRetractFromIso n e hlev = isOfHLevelRetract n (Iso.fun e) (Iso.inv e) 
 
 isOfHLevelRespectEquiv : {A : Type ℓ} {B : Type ℓ'} → (n : HLevel) → A ≃ B → isOfHLevel n A → isOfHLevel n B
 isOfHLevelRespectEquiv n eq = isOfHLevelRetract n (invEq eq) (eq .fst) (retEq eq)
+
+isContrRetractOfConstFun : {A : Type ℓ} {B : Type ℓ'} (b₀ : B)
+   → Σ[ f ∈ (B → A) ] ((x : A) → (f ∘ (λ _ → b₀)) x ≡ x)
+   → isContr A
+fst (isContrRetractOfConstFun b₀ ret) = ret .fst b₀
+snd (isContrRetractOfConstFun b₀ ret) y = ret .snd y
 
 -- h-level of Σ-types
 
