@@ -5,6 +5,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Univalence
@@ -14,9 +15,10 @@ open import Cubical.Data.Sigma
 
 private
   variable
-    ℓ : Level
+    ℓ ℓb : Level
+    B : Type ℓb
 
-module FiberIso {ℓb} {B : Type ℓb} {ℓ} (p⁻¹ : B → Type ℓ) (x : B) where
+module FiberIso {ℓ} (p⁻¹ : B → Type ℓ) (x : B) where
 
   p : Σ B p⁻¹ → B
   p = fst
@@ -46,7 +48,7 @@ module FiberIso {ℓb} {B : Type ℓb} {ℓ} (p⁻¹ : B → Type ℓ) (x : B) w
 
 open FiberIso using (fiberEquiv) public
 
-module _ {ℓb} {B : Type ℓb} {ℓ} {E : Type ℓ} (p : E → B) where
+module _ {ℓ} {E : Type ℓ} (p : E → B) where
 
   -- HoTT Lemma 4.8.2
   totalEquiv : E ≃ Σ B (fiber p)
@@ -57,7 +59,7 @@ module _ {ℓb} {B : Type ℓb} {ℓ} {E : Type ℓ} (p : E → B) where
           Iso.leftInv  isom x           i = x
           Iso.rightInv isom (b , x , q) i = q i , x , λ j → q (i ∧ j)
 
-module _ {ℓb} (B : Type ℓb) (ℓ : Level) where
+module _ (B : Type ℓb) (ℓ : Level) where
   private
     ℓ' = ℓ-max ℓb ℓ
 
@@ -85,55 +87,8 @@ fiber≡ {f = f} {b = b} h h' =
   ΣPath≡PathΣ ⁻¹ ∙
   fiberPath h h'
 
--- fibrant replacement
-module _ {C : Type ℓ} where
-  dispTypeIso : Iso (C → Type ℓ) (Σ[ X ∈ Type ℓ ] (X → C))
-  Iso.fun dispTypeIso D .fst = Σ[ c ∈ C ] D c
-  Iso.fun dispTypeIso D .snd = fst
-  Iso.inv dispTypeIso (X , F) c = Σ[ x ∈ X ] F x ≡ c
-  Iso.leftInv dispTypeIso D = funExt (λ c → ua (e c))
-    where
-      module _ (c : C) where
-        x : isContr (Σ[ c' ∈ C ] (c ≡ c'))
-        x = isContrSingl c
-        e =
-          Σ[ (c' , d) ∈ (Σ[ c' ∈ C ] D c') ] c' ≡ c
-            ≃⟨ Σ-assoc-≃ ⟩
-          Σ[ c' ∈ C ] (D c') × (c' ≡ c)
-            ≃⟨ Σ-cong-equiv-snd (λ _ → Σ-swap-≃) ⟩
-          Σ[ c' ∈ C ] (c' ≡ c) × (D c')
-            ≃⟨ invEquiv Σ-assoc-≃ ⟩
-          Σ[ (c' , _) ∈ Σ[ c' ∈ C ] (c' ≡ c) ] D c'
-            ≃⟨ Σ-cong-equiv-fst (Σ-cong-equiv-snd (λ c' → isoToEquiv (iso sym sym (λ _ → refl) (λ _ → refl)))) ⟩
-          Σ[ (c' , _) ∈ Σ[ c' ∈ C ] (c ≡ c') ] D c'
-            ≃⟨ Σ-contractFst (isContrSingl c) ⟩
-          D c ■
+FibrationStr : (B : Type ℓb) → Type ℓ → Type (ℓ-max ℓ ℓb)
+FibrationStr B A = A → B
 
-  Iso.rightInv dispTypeIso (X , F) = ΣPathP (p₁ , p₂)
-    where
-      p₁' =
-        Σ[ c ∈ C ] (Σ[ x ∈ X ] F x ≡ c)
-           ≃⟨ invEquiv Σ-assoc-≃ ⟩
-        Σ[ (c , x) ∈ C × X ] (F x ≡ c)
-           ≃⟨ Σ-cong-equiv-fst Σ-swap-≃ ⟩
-        Σ[ (x , c) ∈ X × C ] (F x ≡ c)
-           ≃⟨ Σ-assoc-≃ ⟩
-        Σ[ x ∈ X ] Σ[ c ∈ C ] (F x ≡ c)
-           ≃⟨ Σ-contractSnd (λ x → isContrSingl (F x)) ⟩
-        X ■
-      p₁ : (Σ[ c ∈ C ] (Σ[ x ∈ X ] F x ≡ c)) ≡ X
-      p₁ = ua p₁'
-
-      p₂ : PathP (λ i → p₁ i → C) fst F
-      p₂ = funExtDep p₂'
-        where
-          module _ {(c , x , p) : Σ[ c ∈ C ] (Σ[ x ∈ X ] F x ≡ c)} {y : X} (q : PathP (λ i → p₁ i) (c , x , p) y) where
-            p₂' : c ≡ F y
-            p₂' = sym p ∙ cong F p₂''
-              where
-                p₂'' =
-                  x
-                    ≡⟨ sym (uaβ p₁' (c , x , p)) ⟩
-                  transp (λ i → p₁ i) i0 (c , x , p)
-                    ≡⟨ fromPathP q ⟩
-                  y ∎
+Fibration : (B : Type ℓb) → (ℓ : Level) → Type (ℓ-max ℓb (ℓ-suc ℓ))
+Fibration {ℓb = ℓb} B ℓ = Σ[ A ∈ Type ℓ ] FibrationStr B A

@@ -26,15 +26,23 @@ private
     ℓ ℓ' : Level
     A B C : Type ℓ
 
-rec : ∀ {P : Type ℓ} → isProp P → (A → P) → ∥ A ∥ → P
+∥∥-isPropDep : (P : A → Type ℓ) → isOfHLevelDep 1 (λ x → ∥ P x ∥)
+∥∥-isPropDep P = isOfHLevel→isOfHLevelDep 1 (λ _ → squash)
+
+rec : {P : Type ℓ} → isProp P → (A → P) → ∥ A ∥ → P
 rec Pprop f ∣ x ∣ = f x
 rec Pprop f (squash x y i) = Pprop (rec Pprop f x) (rec Pprop f y) i
 
-rec2 : ∀ {P : Type ℓ} → isProp P → (A → A → P) → ∥ A ∥ → ∥ A ∥ → P
-rec2 Pprop f = rec (isPropΠ (λ _ → Pprop))
-                   (λ a → rec Pprop (f a))
+rec2 : {P : Type ℓ} → isProp P → (A → A → P) → ∥ A ∥ → ∥ A ∥ → P
+rec2 Pprop f ∣ x ∣ ∣ y ∣ = f x y
+rec2 Pprop f ∣ x ∣ (squash y z i) = Pprop (rec2 Pprop f ∣ x ∣ y) (rec2 Pprop f ∣ x ∣ z) i
+rec2 Pprop f (squash x y i) z = Pprop (rec2 Pprop f x z) (rec2 Pprop f y z) i
 
-elim : ∀ {P : ∥ A ∥ → Type ℓ} → ((a : ∥ A ∥) → isProp (P a))
+-- Old version
+-- rec2 : ∀ {P : Type ℓ} → isProp P → (A → A → P) → ∥ A ∥ → ∥ A ∥ → P
+-- rec2 Pprop f = rec (isProp→ Pprop) (λ a → rec Pprop (f a))
+
+elim : {P : ∥ A ∥ → Type ℓ} → ((a : ∥ A ∥) → isProp (P a))
      → ((x : A) → P ∣ x ∣) → (a : ∥ A ∥) → P a
 elim Pprop f ∣ x ∣ = f x
 elim Pprop f (squash x y i) =
@@ -43,10 +51,10 @@ elim Pprop f (squash x y i) =
 
 elim2 : {P : ∥ A ∥ → ∥ A ∥ → Type ℓ}
         (Bset : ((x y : ∥ A ∥) → isProp (P x y)))
-        (g : (a b : A) → P ∣ a ∣ ∣ b ∣)
+        (f : (a b : A) → P ∣ a ∣ ∣ b ∣)
         (x y : ∥ A ∥) → P x y
-elim2 Pprop g = elim (λ _ → isPropΠ (λ _ → Pprop _ _))
-                     (λ a → elim (λ _ → Pprop _ _) (g a))
+elim2 Pprop f = elim (λ _ → isPropΠ (λ _ → Pprop _ _))
+                     (λ a → elim (λ _ → Pprop _ _) (f a))
 
 elim3 : {P : ∥ A ∥ → ∥ A ∥ → ∥ A ∥ → Type ℓ}
         (Bset : ((x y z : ∥ A ∥) → isProp (P x y z)))
@@ -71,8 +79,8 @@ propTruncIdempotent : isProp A → ∥ A ∥ ≡ A
 propTruncIdempotent hA = ua (propTruncIdempotent≃ hA)
 
 -- We could also define the eliminator using the recursor
-elim' : ∀ {P : ∥ A ∥ → Type ℓ} → ((a : ∥ A ∥) → isProp (P a)) →
-          ((x : A) → P ∣ x ∣) → (a : ∥ A ∥) → P a
+elim' : {P : ∥ A ∥ → Type ℓ} → ((a : ∥ A ∥) → isProp (P a)) →
+        ((x : A) → P ∣ x ∣) → (a : ∥ A ∥) → P a
 elim' {P = P} Pprop f a =
   rec (Pprop a) (λ x → transp (λ i → P (squash ∣ x ∣ a i)) i0 (f x)) a
 
@@ -113,7 +121,7 @@ module SetElim (Bset : isSet B) where
   helper f kf t (squash u v i)
     = Bset' (helper f kf t u) (helper f kf t v) refl (helper f kf u v) i
 
-  kcomp : ∀(f : ∥ A ∥ → B) → 2-Constant (f ∘ ∣_∣)
+  kcomp : (f : ∥ A ∥ → B) → 2-Constant (f ∘ ∣_∣)
   kcomp f x y = cong f (squash ∣ x ∣ ∣ y ∣)
 
   Fset : isSet (A → B)
@@ -135,8 +143,7 @@ module SetElim (Bset : isSet B) where
   fib : (g : Σ (A → B) 2-Constant) → fiber mkKmap g
   fib (g , kg) = rec→Set g kg , refl
 
-  eqv : (g : Σ (A → B) 2-Constant)
-      → ∀ fi → fib g ≡ fi
+  eqv : (g : Σ (A → B) 2-Constant) → ∀ fi → fib g ≡ fi
   eqv g (f , p) =
     Σ≡Prop (λ f → isOfHLevelΣ 2 Fset Kset _ _)
       (cong (uncurry rec→Set) (sym p) ∙ setRecLemma f)
@@ -348,6 +355,32 @@ module GpdElim (Bgpd : isGroupoid B) where
   trunc→Gpd≃ = compEquiv (equivΠCod preEquiv₂) preEquiv₁
 
 open GpdElim using (rec→Gpd; trunc→Gpd≃) public
+
+squashᵗ
+  : ∀(x y z : A)
+  → Square (squash ∣ x ∣ ∣ y ∣) (squash ∣ x ∣ ∣ z ∣) refl (squash ∣ y ∣ ∣ z ∣)
+squashᵗ x y z i = squash ∣ x ∣ (squash ∣ y ∣ ∣ z ∣ i)
+
+elim→Gpd
+  : (P : ∥ A ∥ → Type ℓ)
+  → (∀ t → isGroupoid (P t))
+  → (f : (x : A) → P ∣ x ∣)
+  → (kf : ∀ x y → PathP (λ i → P (squash ∣ x ∣ ∣ y ∣ i)) (f x) (f y))
+  → (3kf : ∀ x y z
+         → SquareP (λ i j → P (squashᵗ x y z i j)) (kf x y) (kf x z) refl (kf y z))
+  → (t : ∥ A ∥) → P t
+elim→Gpd {A = A} P Pgpd f kf 3kf t = rec→Gpd (Pgpd t) g 3kg t
+  where
+  g : A → P t
+  g x = transp (λ i → P (squash ∣ x ∣ t i)) i0 (f x)
+
+  open 3-Constant
+
+  3kg : 3-Constant g
+  3kg .link x y i
+    = transp (λ j → P (squash (squash ∣ x ∣ ∣ y ∣ i) t j)) i0 (kf x y i)
+  3kg .coh₁ x y z i j
+    = transp (λ k → P (squash (squashᵗ x y z i j) t k)) i0 (3kf x y z i j)
 
 RecHSet : (P : A → TypeOfHLevel ℓ 2) → 3-Constant P → ∥ A ∥ → TypeOfHLevel ℓ 2
 RecHSet P 3kP = rec→Gpd (isOfHLevelTypeOfHLevel 2) P 3kP

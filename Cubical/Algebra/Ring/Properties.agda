@@ -15,9 +15,9 @@ open import Cubical.Data.Sigma
 open import Cubical.Structures.Axioms
 open import Cubical.Structures.Auto
 open import Cubical.Structures.Macro
-open import Cubical.Algebra.Semigroup    hiding (⟨_⟩)
-open import Cubical.Algebra.Monoid       hiding (⟨_⟩)
-open import Cubical.Algebra.AbGroup   hiding (⟨_⟩)
+open import Cubical.Algebra.Semigroup
+open import Cubical.Algebra.Monoid
+open import Cubical.Algebra.AbGroup
 open import Cubical.Algebra.Ring.Base
 
 private
@@ -31,8 +31,8 @@ private
 -}
 module Theory (R' : Ring {ℓ}) where
 
-  open Ring R' renaming (Carrier to R)
-
+  open RingStr (snd R')
+  private R = ⟨ R' ⟩
   implicitInverse : (x y : R)
                  → x + y ≡ 0r
                  → y ≡ - x
@@ -139,14 +139,19 @@ module Theory (R' : Ring {ℓ}) where
   +-assoc-comm2 : (x y z : R) → x + (y + z) ≡ z + (y + x)
   +-assoc-comm2 x y z = +-assoc-comm1 x y z ∙∙ cong (λ x → y + x) (+-comm x z) ∙∙ +-assoc-comm1 y z x
 
+  ·-assoc2 : (x y z w : R) → (x · y) · (z · w) ≡ x · (y · z) · w
+  ·-assoc2 x y z w = ·-assoc (x · y) z w ∙ cong (_· w) (sym (·-assoc x y z))
+
 module HomTheory {R S : Ring {ℓ}} (f′ : RingHom  R S) where
   open Theory ⦃...⦄
-  open Ring ⦃...⦄
+  open RingStr ⦃...⦄
   open RingHom f′
   private
     instance
       _ = R
       _ = S
+      _ = snd R
+      _ = snd S
 
   homPres0 : f 0r ≡ 0r
   homPres0 = +-idempotency→0 (f 0r)
@@ -160,3 +165,35 @@ module HomTheory {R S : Ring {ℓ}} (f′ : RingHom  R S) where
                           f (x + (- x))   ≡⟨ cong f (+-rinv x) ⟩
                           f 0r            ≡⟨ homPres0 ⟩
                           0r ∎)
+
+  ker≡0→inj : ({x : ⟨ R ⟩} → f x ≡ 0r → x ≡ 0r)
+            → ({x y : ⟨ R ⟩} → f x ≡ f y → x ≡ y)
+  ker≡0→inj ker≡0 {x} {y} p = equalByDifference _ _ (ker≡0 path)
+   where
+   path : f (x - y) ≡ 0r
+   path = f (x - y)     ≡⟨ isHom+ _ _ ⟩
+          f x + f (- y) ≡⟨ cong (f x +_) (-commutesWithHom _) ⟩
+          f x - f y     ≡⟨ cong (_- f y) p ⟩
+          f y - f y     ≡⟨ +-rinv _ ⟩
+          0r            ∎
+
+
+module _{R S : Ring {ℓ}} (φ ψ : RingHom  R S) where
+ open RingStr ⦃...⦄
+ open RingHom
+ private
+   instance
+     _ = R
+     _ = S
+     _ = snd R
+     _ = snd S
+
+ RingHom≡f : f φ ≡ f ψ → φ ≡ ψ
+ f (RingHom≡f p i) = p i
+ pres1 (RingHom≡f p i) = isProp→PathP {B = λ i → p i 1r ≡ 1r}
+                                      (λ _ → is-set _ _) (pres1 φ) (pres1 ψ) i
+ isHom+ (RingHom≡f p i) = isProp→PathP {B = λ i → ∀ x y → p i (x + y) ≡ (p i x) + (p i y) }
+                                      (λ _ → isPropΠ2 (λ _ _ → is-set _ _)) (isHom+ φ) (isHom+ ψ) i
+ isHom· (RingHom≡f p i) = isProp→PathP {B = λ i → ∀ x y → p i (x · y) ≡ (p i x) · (p i y) }
+                                      (λ _ → isPropΠ2 (λ _ _ → is-set _ _)) (isHom· φ) (isHom· ψ) i
+

@@ -11,6 +11,7 @@ open import Cubical.Data.Sigma
 open import Cubical.Foundations.Structure
 open import Cubical.Foundations.Structure using (typ) public
 open import Cubical.Foundations.GroupoidLaws
+open import Cubical.Foundations.Isomorphism
 
 private
   variable
@@ -51,3 +52,19 @@ idEquiv∙ (A , ⋆) =
       module _ (a : A) where
         p : isContr (Σ[ a' ∈ A ] a' ≡ a)
         p = isContrRespectEquiv (Σ-cong-equiv-snd (λ a₁ → isoToEquiv (iso sym sym (λ _ → refl) λ _ → refl))) (isContrSingl a)
+
+{- HIT allowing for pattern matching on pointed types -}
+data Pointer {ℓ} (A : Pointed ℓ) : Type ℓ where
+  pt₀ : Pointer A
+  ⌊_⌋ : typ A → Pointer A
+  id : ⌊ pt A ⌋ ≡ pt₀
+
+IsoPointedPointer : ∀ {ℓ} {A : Pointed ℓ} → Iso (typ A) (Pointer A)
+Iso.fun IsoPointedPointer = ⌊_⌋
+Iso.inv (IsoPointedPointer {A = A}) pt₀ = pt A
+Iso.inv IsoPointedPointer ⌊ x ⌋ = x
+Iso.inv (IsoPointedPointer {A = A}) (id i) = pt A
+Iso.rightInv IsoPointedPointer pt₀ = id
+Iso.rightInv IsoPointedPointer ⌊ x ⌋ = refl
+Iso.rightInv IsoPointedPointer (id i) j = id (i ∧ j)
+Iso.leftInv IsoPointedPointer x = refl
