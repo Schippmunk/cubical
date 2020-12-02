@@ -12,6 +12,8 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Structure
+
 open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Homotopy.Base

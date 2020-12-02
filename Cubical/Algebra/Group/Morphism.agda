@@ -46,9 +46,9 @@ fun (η-hom a i) = fun a
 isHom (η-hom a i) = isHom a
 
 η-equiv : {G : Group {ℓ}} {H : Group {ℓ'}} → (a  : GroupEquiv G H)
-       → groupequiv (eq a) (isHom a) ≡ a
-eq (η-equiv a i) = eq a
-isHom (η-equiv a i) = isHom a
+       → groupequiv (GroupEquiv.eq a) (GroupEquiv.isHom a) ≡ a
+GroupEquiv.eq (η-equiv a i) = GroupEquiv.eq a
+GroupEquiv.isHom (η-equiv a i) = GroupEquiv.isHom a
 
 
 ×hom : {A : Group {ℓ}} {B : Group {ℓ'}} {C : Group {ℓ''}} {D : Group {ℓ'''}}

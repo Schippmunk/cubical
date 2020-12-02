@@ -4,8 +4,10 @@ module Cubical.Algebra.Group.Semidirect where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.HLevels
+open import Cubical.Foundations.Structure
 open import Cubical.Algebra.Group.Base
 open import Cubical.Algebra.Group.Morphism
+open import Cubical.Algebra.Group.Notation
 open import Cubical.Algebra.Group.MorphismProperties
 open import Cubical.Algebra.Group.Action
 open import Cubical.Data.Sigma

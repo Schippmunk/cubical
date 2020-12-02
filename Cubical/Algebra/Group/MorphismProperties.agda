@@ -17,12 +17,13 @@ open import Cubical.Data.Sigma
 open import Cubical.Structures.Axioms
 open import Cubical.Structures.Pointed
 open import Cubical.Structures.Subtype
-open import Cubical.Algebra.Semigroup hiding (⟨_⟩)
-open import Cubical.Algebra.Monoid    hiding (⟨_⟩)
+open import Cubical.Algebra.Semigroup
+open import Cubical.Algebra.Monoid
 
 open import Cubical.Algebra.Group.Base
 open import Cubical.Algebra.Group.Properties
 open import Cubical.Algebra.Group.Morphism
+open import Cubical.Algebra.Group.Notation
 
 private
   variable
@@ -315,7 +316,7 @@ GroupMorphismExtIso : {G : Group {ℓ}} {G' : Group {ℓ'}}
 Iso.fun (GroupMorphismExtIso f g) = GroupMorphismExt
 Iso.inv (GroupMorphismExtIso f g) p x = cong (λ h → GroupHom.fun h x) p
 Iso.leftInv (GroupMorphismExtIso {G' = G'} f g) H =
-  funExt (λ x → is-set G'
+  funExt (λ x → is-set (snd G')
                        (GroupHom.fun f x)
                        (GroupHom.fun g x)
                        (inv (GroupMorphismExtIso f g) (fun (GroupMorphismExtIso f g) H) x)
@@ -324,7 +325,7 @@ Iso.rightInv (GroupMorphismExtIso f g) p = isSetGroupHom f g (fun (GroupMorphism
 
 
 module MorphismLemmas {G : Group {ℓ}} {H : Group {ℓ'}} (F : GroupHom G H) where
-  open Group
+  open GroupStr
   open GroupHom
   open GroupNotationG G
   open GroupNotationᴴ H
@@ -374,7 +375,7 @@ module Kernel {ℓ' : Level} {G : Group {ℓ}} {H : Group {ℓ'}} (F : GroupHom 
                    sg-lId
                    sg-lCancel
     where
-      open Group
+      open GroupStr
       open MorphismLemmas F
       open GroupNotationG G
       open GroupLemmas

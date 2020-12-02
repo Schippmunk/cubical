@@ -66,41 +66,41 @@ module GroupLemmas (G : Group {ℓ}) where
             ≡⟨ cong (a +_) (lid (- a)) ∙ invr a ⟩
           0g ∎
 
-    invDistr₃ : (a b c : Carrier) → - ((a + b) + c) ≡ (- c) + ((- b) - a)
+    invDistr₃ : (a b c : ⟨ G ⟩) → - ((a + b) + c) ≡ (- c) + ((- b) - a)
     invDistr₃ a b c = (invDistr (a + b) c) ∙ (cong ((- c) +_) (invDistr a b))
 
-    invDistr₄ : (a b c d : Carrier) → - (((a + b) + c) + d) ≡ (- d) + ((- c) + ((- b) - a))
+    invDistr₄ : (a b c d : ⟨ G ⟩) → - (((a + b) + c) + d) ≡ (- d) + ((- c) + ((- b) - a))
     invDistr₄ a b c d = (invDistr₃ (a + b) c d) ∙ (cong (λ x → (- d) + ((- c) + x)) (invDistr a b))
 
-    assoc-rCancel : (a b : Carrier) → a + ((- a) + b) ≡ b
+    assoc-rCancel : (a b : ⟨ G ⟩) → a + ((- a) + b) ≡ b
     assoc-rCancel a b = (assoc a (- a) b) ∙∙ (cong (_+ b) (invr a)) ∙∙ (lid b)
 
-    assoc-lCancel-lId : (a b : Carrier) → (- a) + (a + b) ≡ b
+    assoc-lCancel-lId : (a b : ⟨ G ⟩) → (- a) + (a + b) ≡ b
     assoc-lCancel-lId a b = assoc (- a) a b ∙∙ (cong (_+ b) (invl a)) ∙∙ (lid b)
 
-    assoc-assoc : (a b c d : Carrier) → a + ((b + c) + d) ≡ ((a + b) + c) + d
+    assoc-assoc : (a b c d : ⟨ G ⟩) → a + ((b + c) + d) ≡ ((a + b) + c) + d
     assoc-assoc a b c d = assoc a (b + c) d ∙ cong (_+ d) (assoc a b c)
 
-    assoc-c--r- : (a b c d : Carrier) → (a + (b + c)) + d ≡ a + (b + (c + d))
+    assoc-c--r- : (a b c d : ⟨ G ⟩) → (a + (b + c)) + d ≡ a + (b + (c + d))
     assoc-c--r- a b c d = sym (assoc a (b + c) d) ∙ cong (a +_) (sym (assoc b c d))
    
 
-    rCancel-lId : (a b : Carrier) → (a - a) + b ≡ b
+    rCancel-lId : (a b : ⟨ G ⟩) → (a - a) + b ≡ b
     rCancel-lId a b = cong (_+ b) (invr a) ∙ lid b
 
-    lCancel-lId : (a b : Carrier) → ((- a) + a) + b ≡ b
+    lCancel-lId : (a b : ⟨ G ⟩) → ((- a) + a) + b ≡ b
     lCancel-lId a b = cong (_+ b) (invl a) ∙ lid b
 
-    rCancel-rId : (a b : Carrier) → a + (b - b) ≡ a
+    rCancel-rId : (a b : ⟨ G ⟩) → a + (b - b) ≡ a
     rCancel-rId a b = (cong (a +_) (invr b)) ∙ (rid a)
 
-    lCancel-rId : (a b : Carrier) → a + (- b + b) ≡ a
+    lCancel-rId : (a b : ⟨ G ⟩) → a + (- b + b) ≡ a
     lCancel-rId a b = (cong (a +_) (invl b)) ∙ (rid a)
 
-    assoc⁻-assocr-lCancel-lId : (a b c : Carrier) → (a - b) + (b + c) ≡ a + c
+    assoc⁻-assocr-lCancel-lId : (a b c : ⟨ G ⟩) → (a - b) + (b + c) ≡ a + c
     assoc⁻-assocr-lCancel-lId a b c = (sym (assoc a (- b) (b + c))) ∙ (cong (a +_) (assoc-lCancel-lId b c))
 
-    lId-lId : (a : Carrier) → 0g + (0g + a) ≡ a
+    lId-lId : (a : ⟨ G ⟩) → 0g + (0g + a) ≡ a
     lId-lId a = (lid (0g + a)) ∙ (lid a)
 
 isPropIsGroup : {G : Type ℓ} (0g : G) (_+_ : G → G → G) (-_ : G → G)

@@ -7,6 +7,7 @@ open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Structure
 
 open import Cubical.Functions.FunExtEquiv
 
@@ -192,7 +193,7 @@ module _ (ℓ ℓ' : Level) where
       t = τ .fun
 
       H⋊G₀ = H ⋊⟨ A ⟩ G₀
-      _+α_ =  Group._+_ H⋊G₀
+      _+α_ =  GroupStr._+_ (snd H⋊G₀)
 
       open GroupNotationᴴ H
       open GroupNotation₀ G₀

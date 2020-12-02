@@ -4,6 +4,7 @@ module Cubical.DStructures.Equivalences.GroupSplitEpiAction where
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
+open import Cubical.Foundations.Structure
 
 open import Cubical.Data.Sigma
 open import Cubical.Data.Unit
@@ -72,7 +73,7 @@ module _ (ℓ ℓ' : Level) where
         ker-σ = ker σ
 
         -- notation: group operation of ker σ
-        _+ₖ_ = ker-σ ._+_
+        _+ₖ_ = GroupStr._+_ (snd ker-σ)
 
         -- the left action structure of G₀ on ker σ
         -- is given by

@@ -110,7 +110,7 @@ module _ {ℓ ℓ' : Level} {A : Type ℓ} (_R_ : Rel A A ℓ') where
           q = fiberEquiv (λ a' → a ≡ a')
                    (λ a' → a R a')
                    (f a)
-                   (snd (isPropEquiv→Equiv (isContr→isProp (isContrSingl a))
+                   (snd (propBiimpl→Equiv (isContr→isProp (isContrSingl a))
                                            (isContr→isProp (c a))
                                            (totf a)
                                            (λ _ → fst (isContrSingl a))))

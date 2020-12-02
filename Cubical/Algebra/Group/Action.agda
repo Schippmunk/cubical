@@ -6,9 +6,11 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Structure
 open import Cubical.Algebra.Group.Base
 open import Cubical.Algebra.Group.Morphism
 open import Cubical.Algebra.Group.Properties
+open import Cubical.Algebra.Group.Notation
 open import Cubical.Algebra.Group.MorphismProperties
 open import Cubical.Structures.LeftAction
 open import Cubical.Structures.Axioms
@@ -26,13 +28,12 @@ record IsGroupAction (G : Group {ℓ = ℓ})
                      
   constructor isgroupaction
 
-  0ᴳ = Group.0g G
-  _+G_ = Group._+_ G
-  
+  open GroupNotationG G
+
   field
     isHom : (g : ⟨ G ⟩) → isGroupHom H H (g α_)
     identity : (h : ⟨ H ⟩) → 0ᴳ α h ≡ h
-    assoc : (g g' : ⟨ G ⟩) → (h : ⟨ H ⟩) → (g +G g') α h ≡ g α (g' α h)
+    assoc : (g g' : ⟨ G ⟩) → (h : ⟨ H ⟩) → (g +ᴳ g') α h ≡ g α (g' α h)
 
 record GroupAction (G : Group {ℓ}) (H : Group {ℓ'}): Type (ℓ-suc (ℓ-max ℓ ℓ')) where
 
@@ -46,20 +47,19 @@ module ActionΣTheory {ℓ ℓ' : Level} where
 
   module _ (G : Group {ℓ}) (H : Group {ℓ'}) (_α_ : LeftActionStructure ⟨ G ⟩ ⟨ H ⟩) where
 
-    private
-      0ᴳ = Group.0g G
-      _+G_ = Group._+_ G
+    open GroupNotationG G
+
     IsGroupActionΣ : Type (ℓ-max ℓ ℓ')
     IsGroupActionΣ = ((g : ⟨ G ⟩) → isGroupHom H H (g α_))
                          × ((h : ⟨ H ⟩) → 0ᴳ α h ≡ h)
-                         × ((g g' : ⟨ G ⟩) → (h : ⟨ H ⟩) → (g +G g') α h ≡ g α (g' α h))
+                         × ((g g' : ⟨ G ⟩) → (h : ⟨ H ⟩) → (g +ᴳ g') α h ≡ g α (g' α h))
 
     isPropIsGroupActionΣ : isProp IsGroupActionΣ
     isPropIsGroupActionΣ = isPropΣ isPropIsHom λ _ → isPropΣ isPropIdentity λ _ → isPropAssoc
       where
         isPropIsHom = isPropΠ (λ g → isPropIsGroupHom H H)
-        isPropIdentity = isPropΠ (λ h → Group.is-set H (0ᴳ α h) h)
-        isPropAssoc = isPropΠ3 (λ g g' h → Group.is-set H ((g +G g') α h) (g α (g' α h)))
+        isPropIdentity = isPropΠ (λ h → GroupStr.is-set (snd H) (0ᴳ α h) h)
+        isPropAssoc = isPropΠ3 (λ g g' h → GroupStr.is-set (snd H) ((g +ᴳ g') α h) (g α (g' α h)))
 
     IsGroupAction→IsGroupActionΣ : IsGroupAction G H _α_ → IsGroupActionΣ
     IsGroupAction→IsGroupActionΣ (isgroupaction isHom identity assoc) = isHom , identity , assoc

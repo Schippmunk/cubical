@@ -5,6 +5,8 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Structure
+
 open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Homotopy.Base
@@ -119,8 +121,8 @@ module ReflGraphLemmas (𝒢 : ReflGraph ℓ ℓ') where
     -- further reductions that are used often
     abstract
       -- σ (g -₁ ι (σ g)) ≡ 0₀
-      σ-g--isg : (g : ⟨ G₁ ⟩) → s (g -₁ 𝒾s g) ≡ 0₀
-      σ-g--isg g = s (g -₁ 𝒾s g)
+      σ-g--isg : (g : ⟨ G₁ ⟩) → s (g -₁ (𝒾s g)) ≡ 0₀
+      σ-g--isg g = s (g -₁ (𝒾s g))
                     ≡⟨ σ .isHom g (-₁ 𝒾s g) ⟩
                   s g +₀ s (-₁ 𝒾s g)
                     ≡⟨ cong (s g +₀_)
